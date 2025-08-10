@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:async';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/game_stats_service.dart';
+import '../utils/helper_functions.dart';
 // import 'package:lottie/lottie.dart';
 // import 'package:confetti/confetti.dart';
 
@@ -27,11 +30,15 @@ class _GameStartScreenBState extends State<GameStartScreenB> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('School Game')),
+      appBar: AppBar(title: const Text('School Game'),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () async {await navigateToUserDashboard(context);},
+      ),),
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset('assets/images/final_bg.png', fit: BoxFit.cover),
+          Image.asset('assets/images/start_bg.jpg', fit: BoxFit.cover),
           Center(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 40.w),
@@ -44,20 +51,20 @@ class _GameStartScreenBState extends State<GameStartScreenB> {
                     height: 100.h,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => const SchoolMapScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        // backgroundColor: Colors.green,
+                        backgroundColor: Colors.red[400],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.r),
                         ),
                       ),
                       child: Text(
                         "Start Game",
-                        style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: Colors.white ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -88,13 +95,13 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
   };
 
   final Map<String, Offset> locationPositions = {
-    'Classroom': Offset(50, 160),
-    'Playground': Offset(220, 100)
+    'Classroom': Offset(68, 155),
+    'Playground': Offset(62, 325)
   };
 
   final Map<String, String> locationIcons = {
-    'Classroom': 'assets/images/classroom.png',
-    'Playground': 'assets/images/playground.png'
+    'Classroom': 'assets/images/classroom_icon.png',
+    'Playground': 'assets/images/playground_icon.png'
   };
 
   double _scale = 1.0;
@@ -159,11 +166,7 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
         content: Text('You completed the game.'),
         actions: [
           TextButton(
-            onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const GameStartScreenB()), );
-            },
+            onPressed: () async {await navigateToUserDashboard(context);},
             child: const Text('OK'),
           ),
         ],
@@ -184,12 +187,16 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
     double completionPercentage = (visitedCount / totalCount) * 100;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('School Map')),
+      appBar: AppBar(title: const Text('School Map'),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () async {await navigateToUserDashboard(context);},
+      ),),
       body: Stack(
         children: [
           // Background Image
           Positioned.fill(
-            child: Image.asset('assets/images/school_bg.jpg', fit: BoxFit.cover),
+            child: Image.asset('assets/images/school_bg2.png', fit: BoxFit.cover),
           ),
 
           // Progress Dashboard (Timer Removed)
@@ -209,16 +216,36 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
                   Text('Visited: $visitedCount / $totalCount',
                       style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold)),
                   Text('Completed: ${completionPercentage.toStringAsFixed(0)}%',
-                      style: TextStyle(fontSize: screenWidth * 0.045)),
+                      style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
           ),
 
-          // Tappable Locations
+          Positioned(
+            top: 122.h, // position right below the progress bar
+            left: 33.w,
+            right: 17.w,
+            child: Center(
+              child: Text(
+                'Tap on a location to explore the scenario.',
+                style: TextStyle(
+                  fontSize: screenWidth * 0.045,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+
+          // For each tappable location in the map:
           ...locationPositions.entries.map((entry) {
             String location = entry.key;
             Offset position = entry.value;
+
+            // Assign different sizes based on location
+            double iconWidth = location == 'Classroom' ? screenWidth * 0.6 : screenWidth * 0.63;
+            double iconHeight = location == 'Classroom' ? screenWidth * 0.44 : screenWidth * 0.47;
 
             return Positioned(
               left: position.dx.w,
@@ -229,14 +256,15 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
                   scale: _scale,
                   duration: const Duration(milliseconds: 150),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Stack(
                         alignment: Alignment.center,
                         children: [
                           Image.asset(
                             locationIcons[location] ?? 'assets/images/red_stop.png',
-                            width: screenWidth * 0.22,
-                            height: screenWidth * 0.22,
+                            width: iconWidth,
+                            height: iconHeight,
                           ),
                           if (visitedLocations[location] == true)
                             Container(
@@ -250,16 +278,69 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
                             ),
                         ],
                       ),
-                      Text(
-                        location,
-                        style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold),
-                      ),
+                      // SizedBox(height: 0.1.h), // very small gap between icon & label
+                      // Text(
+                      //   location,
+                      //   style: TextStyle(
+                      //     fontSize: screenWidth * 0.045,
+                      //     fontWeight: FontWeight.bold,
+                      //     color: Colors.black,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
               ),
             );
-          })
+          }),
+
+
+
+          // // Tappable Locations
+          // ...locationPositions.entries.map((entry) {
+          //   String location = entry.key;
+          //   Offset position = entry.value;
+
+          //   return Positioned(
+          //     left: position.dx.w,
+          //     top: position.dy.h,
+          //     child: GestureDetector(
+          //       onTap: () => _navigateToScenario(location),
+          //       child: AnimatedScale(
+          //         scale: _scale,
+          //         duration: const Duration(milliseconds: 150),
+          //         child: Column(
+          //           children: [
+          //             Stack(
+          //               alignment: Alignment.center,
+          //               children: [
+          //                 Image.asset(
+          //                   locationIcons[location] ?? 'assets/images/red_stop.png',
+          //                   width: screenWidth * 0.52,
+          //                   height: screenWidth * 0.52,
+          //                 ),
+          //                 if (visitedLocations[location] == true)
+          //                   Container(
+          //                     width: screenWidth * 0.1,
+          //                     height: screenWidth * 0.1,
+          //                     decoration: BoxDecoration(
+          //                       color: Colors.green.withOpacity(0.5),
+          //                       shape: BoxShape.circle,
+          //                     ),
+          //                     child: const Icon(Icons.check, color: Colors.white, size: 40),
+          //                   ),
+          //               ],
+          //             ),
+          //             // Text(
+          //             //   location,
+          //             //   style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold),
+          //             // ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   );
+          // })
         ],
       ),
     );
@@ -281,10 +362,6 @@ class ScenarioScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
 
 class ClassroomScenarioScreen extends StatefulWidget {
   const ClassroomScenarioScreen({super.key});
@@ -332,14 +409,14 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
 
   Set<int> sortedCards = {};
   Set<int> flippedCards = {}; // To track flipped state
-  int score = 0;
+  int _score = 0;
   Stopwatch stopwatch = Stopwatch();
   Timer? timer;
   bool gameCompleted = false;
 
   @override
   void initState() {
-    score = 0;
+    _score = 0;
     stopwatch.start();
     super.initState();
     flutterTts.setSpeechRate(0.4);
@@ -364,7 +441,18 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
       speak('Great job! You have sorted all behaviors correctly.');
       setState(() => gameCompleted = true);
       stopwatch.stop();
-      timer?.cancel();
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final score = _score.toDouble();
+      final timeSpent = stopwatch.elapsed.inSeconds.toDouble();
+
+        // ✅ Save stats to Firestore
+      await GameStatsService().updateGamePartStats(
+        gameId: 'Back To School',
+        userId: userId,
+        partId: 'part1',
+        score: score,
+        timeSpent: timeSpent,
+      );
     }
   }
 
@@ -422,13 +510,14 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
       speak('Correct!');
       setState(() {
         sortedCards.add(index);
-        score += 10;
+        _score += 10;
         flippedCards.remove(index);
       });
       checkCompletion();
     } else {
       showTemporaryMessage("Try again!", Colors.red);
       speak('Try Again');
+      _score -= 2;
     }
   }
 
@@ -443,18 +532,19 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Classroom Behavior Game')),
+      appBar: AppBar(title: const Text('Classroom Behavior Game'),
+      automaticallyImplyLeading: false,),
       body: Stack(
         children: [
-          Positioned.fill(child: Image.asset('assets/images/class_bg.jpg', fit: BoxFit.cover)),
+          Positioned.fill(child: Image.asset('assets/images/class_bg.png', fit: BoxFit.cover)),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Score: $score', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                Text('Time: ${stopwatch.elapsed.inSeconds}s', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                Text('Score: $_score', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+                Text('Time: ${stopwatch.elapsed.inSeconds}s', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
               ],
             ),
           ),
@@ -476,7 +566,7 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
           Align(
             alignment: Alignment.center,
             child: Padding(
-              padding: const EdgeInsets.only(top: 120), // adjust this value to move further down
+              padding: const EdgeInsets.only(top: 70), // adjust this value to move further down
               child: Wrap(
                 spacing: 16,
                 runSpacing: 16,
@@ -551,7 +641,7 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
             Center(
               child: AlertDialog(
                 title: const Text('Game Complete'),
-                content: Text('Your time: ${stopwatch.elapsed.inSeconds} seconds\nYour score: $score'),
+                content: Text('Your time: ${stopwatch.elapsed.inSeconds} seconds\nYour score: $_score'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -580,7 +670,7 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
                             child: const Text("Cancel"),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                            onPressed: () => Navigator.pushReplacement(context,  MaterialPageRoute(builder: (_) => const SchoolMapScreen())),
                             child: const Text("Quit"),
                           ),
                         ],
@@ -636,8 +726,8 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
         scale: zoom ? 1.2 : 1.0,
         duration: const Duration(milliseconds: 300),
         child: Container(
-          width: 100,
-          height: 80,
+          width: 90,
+          height: 70,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.brown[150],
@@ -666,15 +756,15 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
             Image.asset(
               imagePath,
               width: 230,
-              height: 220,
+              height: 280,
               fit: BoxFit.contain,
             ),
             Positioned(
-              bottom: 6,
+              bottom: 26,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
+                  // color: Colors.white.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -731,7 +821,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
   String feedbackMessage = '';
   List<String> userSteps = [];
   Set<String> usedSteps = {};
-  int score = 0;
+  int _score = 0;
   Stopwatch stopwatch = Stopwatch();
   Timer? timer;
   bool gameCompleted = false;
@@ -779,7 +869,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
   @override
   void initState() {
     super.initState();
-    score = 0;
+    _score = 0;
     stopwatch.start();
     flutterTts.setSpeechRate(0.4);
     flashcardController = AnimationController(
@@ -807,12 +897,6 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
         showWhatToDo = true; // Show "What to do?" after description
       });
     });
-  }
-
-
-  Future<void> _playStepText(String step) async {
-    await flutterTts.stop();
-    await flutterTts.speak(step);
   }
 
   void showTemporaryMessage(String message, Color color, {
@@ -886,7 +970,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
         // });
         
         showTemporaryMessage("Correct!", Colors.green);
-        score += 20;
+        _score += 10;
 
         await Future.delayed(const Duration(seconds: 4));
         setState(() {
@@ -906,7 +990,18 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
         } else {
           setState(() => gameCompleted = true);
           stopwatch.stop();
-          timer?.cancel();
+          final userId = FirebaseAuth.instance.currentUser!.uid;
+          final score = _score.toDouble();
+          final timeSpent = stopwatch.elapsed.inSeconds.toDouble();
+
+            // ✅ Save stats to Firestore
+          await GameStatsService().updateGamePartStats(
+            gameId: 'Back To School',
+            userId: userId,
+            partId: 'part2',
+            score: score,
+            timeSpent: timeSpent,
+          );
         }
       
     } else {
@@ -917,7 +1012,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
       // });
       
       showTemporaryMessage("Try Again!", Colors.red);
-      score -= 2;
+      _score -= 2;
       await Future.delayed(const Duration(seconds: 4));
         setState(() {
           showFeedback = false;
@@ -936,24 +1031,25 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
     });
   }
 
-  void _showCompletionDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Playground Complete!'),
-        content: const Text('You have finished all the scenarios. Well done!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Closes the dialog
-              Navigator.of(context).pop(); // Closes the PlaygroundScreen and goes back to the map
-            },
-            child: const Text('Back to Map'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _showCompletionDialog() {
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text('Playground Complete!'),
+  //       content: const Text('You have finished all the scenarios. Well done!'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () {
+  //             Navigator.of(context).pop(); // Closes the dialog
+  //             Navigator.of(context).pop(); // Closes the PlaygroundScreen and goes back to the map
+  //           },
+  //           child: const Text('Back to Map'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   bool _listEquals(List<String> a, List<String> b) {
     if (a.length != b.length) return false;
@@ -998,7 +1094,8 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
     
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Playground Scenarios')),
+      appBar: AppBar(title: const Text('Playground Scenarios'),
+      automaticallyImplyLeading: false,),
       body: Stack(
         children: [
           Positioned.fill(
@@ -1013,9 +1110,9 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Score: $score',
+                    'Score: $_score',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1023,7 +1120,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                   Text(
                     'Time: ${stopwatch.elapsed.inSeconds}s',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1166,11 +1263,53 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                       ElevatedButton(
                         onPressed: _resetAttempt,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
+                          backgroundColor: Colors.orangeAccent,
                           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                         ),
                         child: Text('Refresh', style: TextStyle(fontSize: 18.sp , color: Colors.black , fontWeight: FontWeight.bold)),
                       ),
+                      // SizedBox(height: 12.h),
+
+                      // ElevatedButton(
+                      //   onPressed: () {
+                      //     setState(() {
+                      //       userSteps.clear();
+                      //       usedSteps.clear();
+                      //       showFeedback = false;
+                      //       showFlashcard = false;
+                      //       showWhatToDo = false;
+                      //     });
+
+                      //     if (currentScenarioIndex < scenarios.length - 1) {
+                      //       setState(() {
+                      //         currentScenarioIndex++;
+                      //       });
+                      //       _playScenarioIntro(); // Speak new description
+                      //     } else {
+                      //       setState(() => gameCompleted = true);
+                      //       stopwatch.stop();
+                      //       final userId = FirebaseAuth.instance.currentUser!.uid;
+                      //       final score = _score.toDouble();
+                      //       final timeSpent = stopwatch.elapsed.inSeconds.toDouble();
+
+                      //       GameStatsService().updateGamePartStats(
+                      //         gameId: 'Back To School',
+                      //         userId: userId,
+                      //         partId: 'part2',
+                      //         score: score,
+                      //         timeSpent: timeSpent,
+                      //       );
+                      //     }
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: Colors.orangeAccent,
+                      //     padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      //   ),
+                      //   child: Text(
+                      //     'Skip',
+                      //     style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.black),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -1193,7 +1332,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
             Center(
               child: AlertDialog(
                 title: const Text('PlayGround Complete'),
-                content: Text('Your time: ${stopwatch.elapsed.inSeconds} seconds\nYour score: $score'),
+                content: Text('Your time: ${stopwatch.elapsed.inSeconds} seconds\nYour score: $_score'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -1202,6 +1341,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                 ],
               ),
             ),
+
             // 🔴 Game Control Buttons (bottom-left)
           Positioned(
             left: 12.h,
@@ -1222,7 +1362,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                             child: const Text("Cancel"),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                            onPressed: () => Navigator.pushReplacement(context,  MaterialPageRoute(builder: (_) => const SchoolMapScreen())),
                             child: const Text("Quit"),
                           ),
                         ],

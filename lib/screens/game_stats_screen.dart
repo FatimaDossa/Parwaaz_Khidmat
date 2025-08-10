@@ -10,8 +10,12 @@ class GameStatsScreen extends StatelessWidget {
   GameStatsScreen({super.key, required this.gameId});
 
   final Map<String, WidgetBuilder> gameRoutes = {
-      'emotion_game': (_) => const GameStartScreenS(),
-      'classroom_game': (_) => const GameStartScreenB(),
+    // sunshine games
+      'Learning Ninja': (_) => const GameStartScreenS(),
+      'Emotion Explorer': (_) => const GameStartScreenS(),
+      'Mannerism Master': (_) => const GameStartScreenS(),
+    // butterfly games
+      'Back To School': (_) => const GameStartScreenB(),
       // Add more mappings
     };
 
@@ -28,87 +32,111 @@ class GameStatsScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFECCFF5), // lavender
       appBar: AppBar(
         title: Text('$gameId Stats'),
+        automaticallyImplyLeading: false,
       ),
-      body: FutureBuilder<DocumentSnapshot>(
-        future: statsRef.get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+      children: [
+        Expanded(
+          child:
+            FutureBuilder<DocumentSnapshot>(
+              future: statsRef.get(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text("No stats found yet."));
-          }
+                if (!snapshot.hasData || !snapshot.data!.exists) {
+                  return const Center(child: Text("No stats found yet.", style: TextStyle(fontSize: 35),),);
+                }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
-          final parts = data['parts'] as Map<String, dynamic>? ?? {};
+                final data = snapshot.data!.data() as Map<String, dynamic>;
+                final parts = data['parts'] as Map<String, dynamic>? ?? {};
 
-          return Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: parts.entries.map((entry) {
-                    final partId = entry.key;
-                    final stats = entry.value as Map<String, dynamic>;
-
-                    final avgScore = stats['avgScore']?.toDouble() ?? 0;
-                    final avgTime = stats['avgTime']?.toDouble() ?? 0;
-                    final timesCompleted = stats['timesCompleted'] ?? 0;
-
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        title: Text("Part: $partId"),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 8),
-                            Text("📊 Average Score: ${avgScore.toStringAsFixed(1)}"),
-                            Text("⏱️ Average Time: ${avgTime.toStringAsFixed(1)} seconds"),
-                            Text("🔁 Times Completed: $timesCompleted"),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                return Column(
                   children: [
-                    OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Back'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        final builder = gameRoutes[gameId];
-                        if (builder != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: builder),
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.all(16),
+                        children: parts.entries.map((entry) {
+                          final partId = entry.key;
+                          final stats = entry.value as Map<String, dynamic>;
+
+                          final avgScore = stats['avgScore']?.toDouble() ?? 0;
+                          final avgTime = stats['avgTime']?.toDouble() ?? 0;
+                          final timesCompleted = stats['timesCompleted'] ?? 0;
+
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              title: Text("Part: $partId", style: TextStyle(fontSize: 20)),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 12),
+                                  Text("📊 Average Score: ${avgScore.toStringAsFixed(1)}", style: TextStyle(fontSize: 20)),
+                                  Text("⏱️ Average Time: ${avgTime.toStringAsFixed(1)} seconds", style: TextStyle(fontSize: 20)),
+                                  Text("🔁 Times Completed: $timesCompleted", style: TextStyle(fontSize: 20)),
+                                ],
+                              ),
+                            ),
                           );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Game not available')),
-                          );
-                        }
-                      },
-                      child: const Text('Play'),
+                        }).toList(),
+                      ),
+                    ),]
+                );
+              },
+            ),
+          ),
+
+          // ✅ These buttons are always visible
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF39C50), 
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                     ),
-                  ],
+                    child: const Text(
+                      'Back',
+                      style: TextStyle(fontSize: 22),
+                    ),
+                  ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    final builder = gameRoutes[gameId];
+                    if (builder != null) {
+                      Navigator.push(context, MaterialPageRoute(builder: builder));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Game not available')),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF39C50),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  child: const Text('Play', style: TextStyle(fontSize: 22)),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

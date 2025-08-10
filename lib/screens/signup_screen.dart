@@ -404,10 +404,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Already Registered
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        // );
+                        Navigator.pop(context);
                       },
                       child: const Text(
                         'Already Registered? Log in here.',

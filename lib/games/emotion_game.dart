@@ -6,6 +6,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/game_stats_service.dart';
+import '../utils/helper_functions.dart';
 
 
 
@@ -121,7 +122,13 @@ class _GameStartScreenSState extends State<GameStartScreenS> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Emotion Game')),
+      appBar: AppBar(
+      title: const Text('Emotion Game'),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () async {await navigateToUserDashboard(context);},
+      ),
+    ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -168,7 +175,7 @@ class _GameStartScreenSState extends State<GameStartScreenS> {
                     child: ElevatedButton(
                       onPressed: () {
                         flutterTtsEng.stop();
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => const TransitionToLevel1()),
                         );
@@ -339,7 +346,7 @@ class _EmotionRevisionScreenState extends State<EmotionRevisionScreen> {
                             child: const Text("Cancel"),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                            onPressed: () async {await navigateToUserDashboard(context);},
                             child: const Text("Quit"),
                           ),
                         ],
@@ -762,7 +769,7 @@ class _CardGameState extends State<CardGame> {
 
         // ✅ Save stats to Firestore
         await GameStatsService().updateGamePartStats(
-          gameId: 'emotion_game',
+          gameId: 'Emotion Explorer',
           userId: userId,
           partId: 'part1',
           score: score,
@@ -778,14 +785,7 @@ class _CardGameState extends State<CardGame> {
             content: const Text("Do you want to exit or go to the next stage?"),
             actions: [
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const GameStartScreenS(),
-                    ),
-                  );
+                onPressed: () async {await navigateToUserDashboard(context);
                   // setState(() {
                   //   timesPlayed++; 
                   //   // currentLevel = 0;
@@ -797,7 +797,7 @@ class _CardGameState extends State<CardGame> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const TransitionToLevel2(),
@@ -842,7 +842,9 @@ class _CardGameState extends State<CardGame> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Emotion Recognition")),
+      appBar: AppBar(title: const Text("Emotion Recognition"),
+      automaticallyImplyLeading: false,
+      ),
       body: Stack(
         children: [
           // 🟣 Background Image
@@ -982,7 +984,7 @@ class _CardGameState extends State<CardGame> {
 
                           // ✅ Save stats to Firestore
                           await GameStatsService().updateGamePartStats(
-                            gameId: 'emotion_game',
+                            gameId: 'Emotion Explorer',
                             userId: userId,
                             partId: 'part1',
                             score: score,
@@ -995,22 +997,21 @@ class _CardGameState extends State<CardGame> {
                             context: context,
                             builder: (_) => AlertDialog(
                               title: const Text("Level Completed!"),
-                              content: const Text("Do you want to replay or go to the next stage?"),
+                              content: const Text("Do you want to exit or go to the next stage?"),
                               actions: [
                                 TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    setState(() {
-                                      currentLevel = 0;
-                                      generateOptionsForLevel();
-                                    });
+                                  onPressed: () async {await navigateToUserDashboard(context);
+                                    // setState(() {
+                                    //   currentLevel = 0;
+                                    //   generateOptionsForLevel();
+                                    // });
                                   },
-                                  child: const Text("Replay Level"),
+                                  child: const Text("Exit Game"),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
+                                    Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => const TransitionToLevel2(),
@@ -1516,7 +1517,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
         final timeSpent = stopwatch.elapsed.inSeconds.toDouble();
 
         await GameStatsService().updateGamePartStats(
-          gameId: 'emotion_game',
+          gameId: 'Emotion Explorer',
           userId: userId,
           partId: 'part2',
           score: score,
@@ -1531,14 +1532,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
               content: const Text("Do you want to exit or go to the next stage?"),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const GameStartScreenS(),
-                      ),
-                    );
+                  onPressed: () async {await navigateToUserDashboard(context);
                   //   setState(() {
                   //     _level = 1;});
                   },
@@ -1547,7 +1541,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const TransitionToLevel3(),
@@ -1561,7 +1555,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
           );
         // await flutterTtsUrdu.stop();
         // await flutterTtsUrdu.speak("آپ نے تمام سوالات مکمل کر لیے ہیں");
-        }
+      }
         
       // stopwatch.reset();
       stopwatch.start();
@@ -1587,8 +1581,8 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
       appBar: AppBar(
         title: Text(
           'Memory Game - Level $_level',
-          style: TextStyle(fontSize: 24.sp),
         ),
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
@@ -1718,6 +1712,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                 IconButton(
                   icon: Icon(Icons.exit_to_app, color: Colors.white, size: 28.sp),
                   onPressed: () {
+                    stopwatch.stop();
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
@@ -1729,7 +1724,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                             child: const Text("Cancel"),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                            onPressed: () async {await navigateToUserDashboard(context);},
                             child: const Text("Quit"),
                           ),
                         ],
@@ -2294,7 +2289,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
 
             // ✅ Save stats to Firestore for Part 3
             await GameStatsService().updateGamePartStats(
-              gameId: 'emotion_game',
+              gameId: 'Emotion Explorer',
               userId: userId,
               partId: 'part3',
               score: score,
@@ -2309,10 +2304,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                 content: const Text("You've answered all scenarios!"),
                 actions: [
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const GameStartScreenS()),
-                      );
-                    },
+                   onPressed: () async {await navigateToUserDashboard(context);},
                     child: const Text("Finish"),
                   ),
                 ],
@@ -2350,6 +2342,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
       return Scaffold(
         appBar: AppBar(
           title: Text("Scenario Box Game", style: TextStyle(fontSize: 24.sp)),
+          automaticallyImplyLeading: false,
         ),
         body: Stack(
           children: [
@@ -2473,39 +2466,6 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                                 ],
                               ),
 
-
-                              // // 🔘 Options
-                              // ...List.generate(
-                              //   _scenarios[_currentIndex!]["options"].length,
-                              //   (i) => Padding(
-                              //     padding: EdgeInsets.symmetric(vertical: 6.h),
-                              //     child: ElevatedButton(
-                              //       onPressed: () => _checkAnswer(i),
-                              //       style: ElevatedButton.styleFrom(
-                              //         backgroundColor:
-                              //             currentlySpeakingIndex == i
-                              //                 ? Colors.blue
-                              //                 : _answered
-                              //                     ? i ==
-                              //                             _scenarios[_currentIndex!]
-                              //                                 ["correct"]
-                              //                         ? Colors.green
-                              //                         : i == _selectedOption
-                              //                             ? Colors.red
-                              //                             : Colors.grey[200]
-                              //                     : Colors.white,
-                              //         padding: EdgeInsets.symmetric(
-                              //             vertical: 16.h, horizontal: 12.w),
-                              //       ),
-                              //       child: Text(
-                              //         _scenarios[_currentIndex!]["options"][i],
-                              //         style: TextStyle(
-                              //             fontSize: 18.sp, color: Colors.black),
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-
                               // 🔘 Emoji Options (side by side)
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -2570,7 +2530,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                                             final timeSpent = stopwatch.elapsed.inSeconds.toDouble();
 
                                             await GameStatsService().updateGamePartStats(
-                                              gameId: 'emotion_game',
+                                              gameId: 'Emotion Explorer',
                                               userId: userId,
                                               partId: 'part3',
                                               score: score,
@@ -2585,12 +2545,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                                                 content: const Text("You've answered all scenarios!"),
                                                 actions: [
                                                   TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pushReplacement(
-                                                        context,
-                                                        MaterialPageRoute(builder: (_) => const GameStartScreenS()),
-                                                      );
-                                                    },
+                                                    onPressed: () async {await navigateToUserDashboard(context);},
                                                     child: const Text("Finish"),
                                                   ),
                                                 ],
@@ -2635,8 +2590,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                               child: const Text("Cancel"),
                             ),
                             TextButton(
-                              onPressed: () => Navigator.popUntil(
-                                  context, (route) => route.isFirst),
+                              onPressed: () async {await navigateToUserDashboard(context);},
                               child: const Text("Quit"),
                             ),
                           ],

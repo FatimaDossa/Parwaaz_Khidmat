@@ -30,8 +30,8 @@ class GameStatsService {
       final newCount = prevCount + 1;
 
       await docRef.update({
-        '$partPath.avgScore': ((prevScore * prevCount) + score) / newCount,
-        '$partPath.avgTime': ((prevTime * prevCount) + timeSpent) / newCount,
+        '$partPath.avgScore': newCount > 0 ? (prevScore + score) / newCount : score,
+        '$partPath.avgTime': newCount > 0 ? (prevTime + timeSpent) / newCount : score,
         '$partPath.timesCompleted': newCount,
         'lastPlayed': FieldValue.serverTimestamp(),
       });
