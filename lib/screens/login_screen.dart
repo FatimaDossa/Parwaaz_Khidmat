@@ -7,16 +7,16 @@ import '../dashboard/sunshine_dashboard.dart';
 import 'forgot_password.dart';
 
 
-class PasswordField extends StatefulWidget {
+class _PasswordField extends StatefulWidget {
   final TextEditingController controller;
 
-  const PasswordField({super.key, required this.controller});
+  const _PasswordField({required this.controller});
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
 }
 
-class _PasswordFieldState extends State<PasswordField> {
+class _PasswordFieldState extends State<_PasswordField> {
   bool _obscureText = true;
 
   @override
@@ -70,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (result.error != null) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result.error!)),
         );
@@ -81,7 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
               .get();
 
           final userType = doc.data()?['userType'];
-
+          if (!mounted) return; 
+        
           if (userType == 'SUNSHINE') {
             Navigator.pushReplacement(
               context,
@@ -99,11 +101,12 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         }
     } }catch (e) {
+       if (!mounted) return; 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $e')),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {setState(() => _isLoading = false);}
     }
   }
 
@@ -194,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          PasswordField(
+                          _PasswordField(
                             controller: _passwordController,
                           ),
                           const SizedBox(height: 24),
@@ -272,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 12),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (_) => const SignupScreen()),
                             );

@@ -11,6 +11,8 @@ Future<void> navigateToUserDashboard(BuildContext context) async {
     final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
     final userType = doc['userType'];
 
+    if (!context.mounted) return;
+
     if (userType == 'SUNSHINE') {
       Navigator.pushAndRemoveUntil(
         context,
@@ -47,3 +49,10 @@ Future<void> showErrorDialog(BuildContext context, String message) async {
     ),
   );
 }
+
+Future<void> preloadGameAssets(BuildContext context, List<String> assetPaths) async {
+  for (var asset in assetPaths) {
+    await precacheImage(AssetImage(asset), context);
+  }
+}
+

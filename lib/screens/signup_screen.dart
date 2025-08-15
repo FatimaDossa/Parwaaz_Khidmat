@@ -27,16 +27,16 @@ InputDecoration _inputDecoration(String hint) => InputDecoration(
 
 
 
-class PasswordField extends StatefulWidget {
+class _PasswordField extends StatefulWidget {
   final TextEditingController controller;
 
-  const PasswordField({super.key, required this.controller});
+  const _PasswordField({required this.controller});
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
 }
 
-class _PasswordFieldState extends State<PasswordField> {
+class _PasswordFieldState extends State<_PasswordField> {
   bool _obscureText = true;
 
   @override
@@ -100,6 +100,7 @@ class _SignupScreenState extends State<SignupScreen> {
         _usernameController.text.trim(),
       );
 
+      if (!mounted) return;
       if (result.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result.error!)),
@@ -136,235 +137,6 @@ class _SignupScreenState extends State<SignupScreen> {
       setState(() => _isLoading = false);
     }
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     body: Stack(
-  //       children: [
-  //         // Background Image
-  //         SizedBox.expand(
-  //           child: Image.asset(
-  //             'assets/images/signup_bg.png', // Replace with your uploaded image
-  //             fit: BoxFit.cover,
-  //           ),
-  //         ),
-
-  //         // Main Content
-  //         Center(
-  //           child: SingleChildScrollView(
-  //             child: Column(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 const SizedBox(height: 40), // Top spacing
-  //                 // Sign Up Title
-  //                 const Text(
-  //                   'Sign Up',
-  //                   style: TextStyle(
-  //                     fontSize: 50, // Larger font size for emphasis
-  //                     fontWeight: FontWeight.bold,
-  //                     color: Colors.black,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 8),
-  //                 // Log In Link
-  //                 GestureDetector(
-  //                   onTap: () {
-  //                     // Navigate explicitly to the LoginScreen
-  //                     Navigator.push(
-  //                       context,
-  //                       MaterialPageRoute(builder: (context) => const LoginScreen()),
-  //                     );
-  //                   },
-  //                   child: const Text(
-  //                     'Already Registered? Log in here.',
-  //                     style: TextStyle(
-  //                       fontSize: 20,
-  //                       color: Colors.black54,
-  //                       decoration: TextDecoration.underline,
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 32),
-
-  //                 // White Container for Form
-  //                 Container(
-  //                   padding: const EdgeInsets.all(24),
-  //                   margin: const EdgeInsets.symmetric(horizontal: 24),
-  //                   decoration: BoxDecoration(
-  //                     color: Colors.white,
-  //                     borderRadius: BorderRadius.circular(20),
-  //                     boxShadow: [
-  //                       BoxShadow(
-  //                         color: Colors.black,
-  //                         blurRadius: 8,
-  //                         offset: const Offset(0, 4),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   child: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       // Username Field
-  //                       const Text(
-  //                         'USERNAME',
-  //                         style: TextStyle(
-  //                           fontSize: 20,
-  //                           fontWeight: FontWeight.bold,
-  //                           color: Colors.black,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 8),
-  //                       TextField(
-  //                         controller: _usernameController,
-  //                         decoration: InputDecoration(
-  //                           hintText: 'Enter your username',
-  //                           hintStyle: const TextStyle(fontSize: 20),
-  //                           border: OutlineInputBorder(
-  //                             borderRadius: BorderRadius.circular(10),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 16),
-
-  //                       // Email Field
-  //                       const Text(
-  //                         'EMAIL',
-  //                         style: TextStyle(
-  //                           fontSize: 20,
-  //                           fontWeight: FontWeight.bold,
-  //                           color: Colors.black,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 8),
-  //                       TextField(
-  //                         controller: _emailController,
-  //                         decoration: InputDecoration(
-  //                           hintText: 'Enter Email',
-  //                           hintStyle: const TextStyle(fontSize: 20),
-  //                           border: OutlineInputBorder(
-  //                             borderRadius: BorderRadius.circular(10),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 16),
-
-  //                       // Password Field
-  //                       const Text(
-  //                         'PASSWORD',
-  //                         style: TextStyle(
-  //                           fontSize: 20,
-  //                           fontWeight: FontWeight.bold,
-  //                           color: Colors.black,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 8),
-  //                       PasswordField(controller: _passwordController),
-  //                       // TextField(
-  //                       //   obscureText: true,
-  //                       //   controller: _passwordController,
-  //                       //   decoration: InputDecoration(
-  //                       //     hintText: 'Enter your password',
-  //                       //     hintStyle: const TextStyle(fontSize: 20),
-  //                       //     border: OutlineInputBorder(
-  //                       //       borderRadius: BorderRadius.circular(10),
-  //                       //     ),
-  //                       //   ),
-  //                       // ),
-  //                       const SizedBox(height: 16),
-
-  //                       // Group Dropdown
-  //                       const Text(
-  //                         'GROUP',
-  //                         style: TextStyle(
-  //                           fontSize: 20,
-  //                           fontWeight: FontWeight.bold,
-  //                           color: Colors.black,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 8),
-  //                       DropdownButtonFormField<String>(
-  //                         decoration: InputDecoration(
-  //                           border: OutlineInputBorder(
-  //                             borderRadius: BorderRadius.circular(10),
-  //                           ),
-  //                         ),
-  //                         items: const [
-  //                           DropdownMenuItem(
-  //                             value: 'SUNSHINE',
-  //                             child: Text(
-  //                               'Sunshine ☀️',
-  //                               style: TextStyle(
-  //                                 fontSize:
-  //                                     20, // Increased font size for dropdown values
-  //                                 fontWeight: FontWeight
-  //                                     .bold, // Optional: Make text bold
-  //                                 color:
-  //                                     Colors.black, // Optional: Set text color
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           DropdownMenuItem(
-  //                             value: 'BUTTERFLY',
-  //                             child: Text(
-  //                               'Butterfly 🦋',
-  //                               style: TextStyle(
-  //                                 fontSize:
-  //                                     20, // Increased font size for dropdown values
-  //                                 fontWeight: FontWeight
-  //                                     .bold, // Optional: Make text bold
-  //                                 color:
-  //                                     Colors.black, // Optional: Set text color
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ],
-  //                         onChanged: (value) {
-  //                           setState(() {
-  //                             _selectedUserType = value!;
-  //                           });
-  //                         },
-  //                       ),
-  //                       const SizedBox(height: 32),
-
-  //                       // Sign Up Button
-  //                       SizedBox(
-  //                         width: double.infinity,
-  //                         child: ElevatedButton(
-  //                           style: ElevatedButton.styleFrom(
-  //                             backgroundColor: const Color.fromARGB(
-  //                               255,
-  //                               235,
-  //                               120,
-  //                               20,
-  //                             ), // Orange color
-  //                             padding: const EdgeInsets.symmetric(vertical: 16),
-  //                             shape: RoundedRectangleBorder(
-  //                               borderRadius: BorderRadius.circular(10),
-  //                             ),
-  //                           ),
-  //                           onPressed: _handleSignup,
-  //                           child: const Text(
-  //                             'Sign up',
-  //                             style: TextStyle(
-  //                               fontSize: 20,
-  //                               fontWeight: FontWeight.bold,
-  //                               color: Colors.white,
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
   
   @override
   Widget build(BuildContext context) {
@@ -404,11 +176,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Already Registered
                     GestureDetector(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        // );
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        );
                       },
                       child: const Text(
                         'Already Registered? Log in here.',
@@ -462,7 +233,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           // Password
                           const Text('PASSWORD', style: _labelStyle),
                           const SizedBox(height: 8),
-                          PasswordField(controller: _passwordController),
+                          _PasswordField(controller: _passwordController),
                           const SizedBox(height: 16),
 
                           // Dropdown

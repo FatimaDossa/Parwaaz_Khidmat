@@ -17,72 +17,207 @@ class GameStartScreenB extends StatefulWidget {
 }
 
 class _GameStartScreenBState extends State<GameStartScreenB> {
+  bool isLoading = false;
+  double progress = 0.0;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> _loadGameAssets() async {
+    // List of assets to preload
+    List<String> assetsToLoad = [
+      'assets/images/start_bg.jpg',
+      'assets/images/school_bg2.png',
+      'assets/images/playground_icon.png',
+      'assets/images/classroom_icon.png',
+      'assets/images/class_bg.png',
+      'assets/images/carton_box.png',
+      'assets/images/classroom1.jpg',
+      'assets/images/classroom2.jpg',
+      'assets/images/classroom3.jpg',
+      'assets/images/classroom4.jpg',
+      'assets/images/classroom5.jpg',
+      'assets/images/classroom6.jpg',
+      'assets/images/playground_bg.jpg',
+      'assets/images/playground1.png',
+      'assets/images/playground2.png',
+      'assets/images/playground3.png',
+      'assets/images/playground4.png',
+    ];
+
+    // Load each asset and update progress
+    for (int i = 0; i < assetsToLoad.length; i++) {
+      if (!mounted) return;
+      await precacheImage(AssetImage(assetsToLoad[i]), context)
+          .catchError((_) {}); // Ignore errors but keep progress
+
+      setState(() {
+        progress = (i + 1) / assetsToLoad.length;
+      });
+
+      await Future.delayed(const Duration(milliseconds: 200)); // Simulated delay
+    }
+
+    if (!mounted) return;
+    // Once loaded, go to game
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const SchoolMapScreen()),
+    );
+
+    // Reset
+    // setState(() {
+    //   isLoading = false;
+    //   progress = 0.0;
+    // });
+    
+  }
+  
+
+  void _startGameWithLoading() {
+    setState(() {
+      isLoading = true;
+      progress = 0.0;
+    });
+    _loadGameAssets();
   }
 
   @override
   void dispose() {
     super.dispose();
   }
-  
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('School Game'),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () async {await navigateToUserDashboard(context);},
-      ),),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset('assets/images/start_bg.jpg', fit: BoxFit.cover),
-          Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.w),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Start Game Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 100.h,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SchoolMapScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[400],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.r),
+    Widget build(BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('School Game'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () async {
+              await navigateToUserDashboard(context);
+            },
+          ),
+        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset('assets/images/start_bg.jpg', fit: BoxFit.cover),
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Start or Loading
+                    if (!isLoading)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100.h,
+                        child: ElevatedButton(
+                          onPressed: _startGameWithLoading,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red[400],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                          ),
+                          child: Text(
+                            "Start Game",
+                            style: TextStyle(
+                              fontSize: 32.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
+                      )
+                    else
+                      Column(
+                        children: [
+                          LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 12.h,
+                            backgroundColor: Colors.grey[300],
+                            color: Colors.red[400],
+                          ),
+                          SizedBox(height: 10.h),
+                          Text(
+                            "${(progress * 100).toInt()}% Loading...",
+                            style: TextStyle(
+                                fontSize: 20.sp, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        "Start Game",
-                        style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: Colors.white ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
+    }
 }
+  
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(title: const Text('School Game'),
+  //     leading: IconButton(
+  //       icon: const Icon(Icons.arrow_back),
+  //       onPressed: () async {await navigateToUserDashboard(context);},
+  //     ),),
+  //     body: Stack(
+  //       fit: StackFit.expand,
+  //       children: [
+  //         Image.asset('assets/images/start_bg.jpg', fit: BoxFit.cover),
+  //         Center(
+  //           child: Padding(
+  //             padding: EdgeInsets.symmetric(horizontal: 40.w),
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 // Start Game Button
+  //                 SizedBox(
+  //                   width: double.infinity,
+  //                   height: 100.h,
+  //                   child: ElevatedButton(
+  //                     onPressed: () {
+  //                       Navigator.pushReplacement(
+  //                         context,
+  //                         MaterialPageRoute(builder: (_) => const SchoolMapScreen()),
+  //                       );
+  //                     },
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: Colors.red[400],
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(16.r),
+  //                       ),
+  //                     ),
+  //                     child: Text(
+  //                       "Start Game",
+  //                       style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: Colors.white ),
+  //                       textAlign: TextAlign.center,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
 
 
 
 class SchoolMapScreen extends StatefulWidget {
-  const SchoolMapScreen({Key? key}) : super(key: key);
+    const SchoolMapScreen({super.key});
 
   @override
   State<SchoolMapScreen> createState() => _SchoolMapScreenState();
@@ -126,6 +261,8 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
     setState(() {
       _scale = 1.0;
     });
+
+    if (!mounted) return;
 
     // Navigate to the correct screen and wait until user returns
     if (location == 'Classroom') {
@@ -174,10 +311,10 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +344,7 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
             child: Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha:0.8),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Row(
@@ -271,7 +408,7 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
                               width: screenWidth * 0.1,
                               height: screenWidth * 0.1,
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.5),
+                                color: Colors.green.withValues(alpha: 0.5),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.check, color: Colors.white, size: 40),
@@ -350,7 +487,8 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
 // Dummy Scenario Screen
 class ScenarioScreen extends StatelessWidget {
   final String location;
-  const ScenarioScreen({Key? key, required this.location}) : super(key: key);
+  const ScenarioScreen({super.key, required this.location});
+
 
   @override
   Widget build(BuildContext context) {
@@ -552,14 +690,14 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
           Align(
             alignment: Alignment.bottomLeft,
             child: DragTarget<int>(
-              onAccept: (index) => handleDrop(index, true),
+             onAcceptWithDetails: (details) {handleDrop(details.data, true);},
               builder: (context, _, __) => _buildTargetBox('Good Behavior', 'assets/images/carton_box.png'),
             ),
           ),
           Align(
             alignment: Alignment.bottomRight,
             child: DragTarget<int>(
-              onAccept: (index) => handleDrop(index, false),
+              onAcceptWithDetails: (details) {handleDrop(details.data, false);},
               builder: (context, _, __) => _buildTargetBox('Bad Behavior', 'assets/images/carton_box.png'),
             ),
           ),
@@ -640,7 +778,7 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
           if (gameCompleted)
             Center(
               child: AlertDialog(
-                title: const Text('Game Complete'),
+                title: const Text('Scenario Complete'),
                 content: Text('Your time: ${stopwatch.elapsed.inSeconds} seconds\nYour score: $_score'),
                 actions: [
                   TextButton(
@@ -662,7 +800,7 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: const Text("Quit Game"),
+                        title: const Text("Quit Scenario"),
                         content: const Text("Are you sure you want to quit?"),
                         actions: [
                           TextButton(
@@ -1239,7 +1377,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                           return Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.h),
                             child: DragTarget<String>(
-                              onAccept: (data) => _handleDrop(index, data),
+                              onAcceptWithDetails: (details) {_handleDrop(index, details.data);},
                               builder: (context, candidateData, rejectedData) {
                                 return Container(
                                   width: 250.w,
@@ -1331,7 +1469,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
             if (gameCompleted)
             Center(
               child: AlertDialog(
-                title: const Text('PlayGround Complete'),
+                title: const Text('Scenario Complete'),
                 content: Text('Your time: ${stopwatch.elapsed.inSeconds} seconds\nYour score: $_score'),
                 actions: [
                   TextButton(
@@ -1354,7 +1492,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: const Text("Quit Game"),
+                        title: const Text("Quit Scenario"),
                         content: const Text("Are you sure you want to quit?"),
                         actions: [
                           TextButton(

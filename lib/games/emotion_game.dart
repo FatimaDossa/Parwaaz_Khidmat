@@ -69,7 +69,7 @@ class EmotionLabel extends StatelessWidget {
 // }
 
 
-class flutterTtsEng {
+class FlutterTtsEng {
   static final FlutterTts _tts = FlutterTts();
 
   static Future<void> init() async {
@@ -100,22 +100,91 @@ class GameStartScreenS extends StatefulWidget {
 }
 
 class _GameStartScreenSState extends State<GameStartScreenS> {
+
+  bool isLoading = false;
+  double progress = 0.0;
+
+  Future<void> _loadGameAssets() async {
+    // List of assets to preload
+    List<String> assetsToLoad = [
+      'assets/images/map_final.jpg',
+      'assets/images/final_bg.png',
+      'assets/images/afraid.png',
+      'assets/images/angry.png',
+      'assets/images/bad_marks.png',
+      'assets/images/eid.png',
+      'assets/images/fighting.png',
+      'assets/images/fun_with_friends.png',
+      'assets/images/girl_hurt.png',
+      'assets/images/giving_gift.png',
+      'assets/images/happy.png',
+      'assets/images/home_stop.png',
+      'assets/images/level_1.png',
+      'assets/images/level_2.png',
+      'assets/images/level_3.png',
+      'assets/images/paw_left.png',
+      'assets/images/paw_right.png',
+      'assets/images/red_stop.png',
+      'assets/images/sad.png',
+      'assets/images/sick.png',
+      'assets/images/surprised.png',
+      'assets/images/worried.png',
+
+    ];
+
+    // Load each asset and update progress
+    for (int i = 0; i < assetsToLoad.length; i++) {
+      if (!mounted) return;
+      await precacheImage(AssetImage(assetsToLoad[i]), context)
+          .catchError((_) {}); // Ignore errors but keep progress
+
+      setState(() {
+        progress = (i + 1) / assetsToLoad.length;
+      });
+
+      await Future.delayed(const Duration(milliseconds: 200)); // Simulated delay
+    }
+
+    if (!mounted) return;
+    // Once loaded, go to game
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const TransitionToLevel1()),
+    );
+
+    // Reset
+    // setState(() {
+    //   isLoading = false;
+    //   progress = 0.0;
+    // });
+    
+  }
+  
+
+  void _startGameWithLoading() {
+    setState(() {
+      isLoading = true;
+      progress = 0.0;
+    });
+    _loadGameAssets();
+  }
+
   @override
   void initState() {
     super.initState();
 
-    flutterTtsEng.init();
+    FlutterTtsEng.init();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // flutterTtsUrdu.speak("سلام! آئیں کھیل شروع کریں۔ جب آپ تیار ہوں تو اسٹارٹ کا بٹن دبائیں۔");
-      flutterTtsEng.speak("To revise the emotions. Press Revise Emotions. To begin the game. Press the Start Game button.");
+      FlutterTtsEng.speak("To revise the emotions. Press Revise Emotions. To begin the game. Press the Start Game button.");
     });
   }
 
   @override
   void dispose() {
     // flutterTtsUrdu.stop();
-    flutterTtsEng.stop();
+    FlutterTtsEng.stop();
     super.dispose();
   }
   
@@ -146,7 +215,7 @@ class _GameStartScreenSState extends State<GameStartScreenS> {
                     height: 100.h,
                     child: ElevatedButton(
                       onPressed: () {
-                        flutterTtsEng.stop();
+                        FlutterTtsEng.stop();
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const EmotionRevisionScreen()),
@@ -168,31 +237,72 @@ class _GameStartScreenSState extends State<GameStartScreenS> {
 
                   SizedBox(height: 40.h),
 
-                  // Start Game Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 100.h,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        flutterTtsEng.stop();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const TransitionToLevel1()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        // backgroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.r),
+                  // // Start Game Button
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   height: 100.h,
+                  //   child: ElevatedButton(
+                  //     onPressed: () {
+                  //       FlutterTtsEng.stop();
+                  //       Navigator.pushReplacement(
+                  //         context,
+                  //         MaterialPageRoute(builder: (_) => const TransitionToLevel1()),
+                  //       );
+                  //     },
+                  //     style: ElevatedButton.styleFrom(
+                  //       // backgroundColor: Colors.green,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(16.r),
+                  //       ),
+                  //     ),
+                  //     child: Text(
+                  //       "Start Game",
+                  //       style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
+                  //       textAlign: TextAlign.center,
+                  //     ),
+                  //   ),
+                  // ),
+                  // Start or Loading
+                    if (!isLoading)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100.h,
+                        child: ElevatedButton(
+                          onPressed: _startGameWithLoading,
+                          style: ElevatedButton.styleFrom(
+                            // backgroundColor: Colors.red[400],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                          ),
+                          child: Text(
+                            "Start Game",
+                            style: TextStyle(
+                              fontSize: 32.sp,
+                              fontWeight: FontWeight.bold,
+                              // color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
+                      )
+                    else
+                      Column(
+                        children: [
+                          LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 12.h,
+                            backgroundColor: Colors.grey[300],
+                            color: Colors.blue[400],
+                          ),
+                          SizedBox(height: 10.h),
+                          Text(
+                            "${(progress * 100).toInt()}% Loading...",
+                            style: TextStyle(
+                                fontSize: 20.sp, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        "Start Game",
-                        style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -204,7 +314,7 @@ class _GameStartScreenSState extends State<GameStartScreenS> {
 }
 
 class EmotionRevisionScreen extends StatefulWidget {
-  const EmotionRevisionScreen({Key? key}) : super(key: key);
+  const EmotionRevisionScreen({super.key});
 
   @override
   State<EmotionRevisionScreen> createState() => _EmotionRevisionScreenState();
@@ -225,12 +335,12 @@ class _EmotionRevisionScreenState extends State<EmotionRevisionScreen> {
   @override
   void initState() {
     super.initState();
-    flutterTtsEng.init();
+    FlutterTtsEng.init();
     _speakCurrentEmotion();
   }
 
   void _speakCurrentEmotion() async {
-    await flutterTtsEng.speak(_emotions[_currentIndex]["label"]!);
+    await FlutterTtsEng.speak(_emotions[_currentIndex]["label"]!);
   }
 
   void _nextEmotion() async {
@@ -279,7 +389,7 @@ class _EmotionRevisionScreenState extends State<EmotionRevisionScreen> {
 
   @override
   void dispose() {
-    flutterTtsEng.stop();
+    FlutterTtsEng.stop();
     super.dispose();
   }
 
@@ -346,7 +456,11 @@ class _EmotionRevisionScreenState extends State<EmotionRevisionScreen> {
                             child: const Text("Cancel"),
                           ),
                           TextButton(
-                            onPressed: () async {await navigateToUserDashboard(context);},
+                            onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => const GameStartScreenS()),);},
                             child: const Text("Quit"),
                           ),
                         ],
@@ -468,7 +582,7 @@ class _TransitionToLevel1State extends State<TransitionToLevel1>
       builder: (context) => AlertDialog(
         title: const Text("Emotion Recognition Game"),
         content: const Text(
-          "You are now going to start the first level in which you have to match the emotions with the correct name. Best of luck!",
+          "You are now going to start the first part in which you have to match the emotions with the correct name. Best of luck!",
         ),
         actions: [
           TextButton(
@@ -476,7 +590,7 @@ class _TransitionToLevel1State extends State<TransitionToLevel1>
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const CardGame()), // Replace with your game 
               );
             },
-            child: const Text("Start Game"),
+            child: const Text("Start"),
           )
         ],
       ),
@@ -626,7 +740,7 @@ class _CardGameState extends State<CardGame> {
     totalScore = 0;                       // Initialize score
     attempts = 0;                         // Initialize attempt count
     generateOptionsForLevel();           // Generate initial options
-    flutterTtsEng.init();
+    FlutterTtsEng.init();
 
       // Update timer every second
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -665,7 +779,7 @@ class _CardGameState extends State<CardGame> {
       });
 
       // await flutterTtsUrdu.speak(urduMap[option] ?? option);
-      await flutterTtsEng.speak(option);
+      await FlutterTtsEng.speak(option);
       await Future.delayed(const Duration(seconds: 2)); // wait before next
     }
 
@@ -743,8 +857,8 @@ class _CardGameState extends State<CardGame> {
       showTemporaryMessage("Correct!", Colors.green);
       showConfetti();
       // await flutterTtsUrdu.speak("شاباش! بہت خوب");
-      await flutterTtsEng.stop();
-      await flutterTtsEng.speak("Good Job");
+      await FlutterTtsEng.stop();
+      await FlutterTtsEng.speak("Good Job");
 
       // ✅ Message stays on screen while TTS is speaking
       await Future.delayed(const Duration(seconds: 2)); // Small pause after speech
@@ -781,8 +895,8 @@ class _CardGameState extends State<CardGame> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text("Level Completed!"),
-            content: const Text("Do you want to exit or go to the next stage?"),
+            title: const Text("Part 1 Completed!"),
+            content: const Text("Do you want to exit or go to the next part?"),
             actions: [
               TextButton(
                 onPressed: () async {await navigateToUserDashboard(context);
@@ -804,7 +918,7 @@ class _CardGameState extends State<CardGame> {
                     ),
                   );
                 },
-                child: const Text("Next Stage"),
+                child: const Text("Next Part"),
               ),
             ],
           ),
@@ -823,8 +937,8 @@ class _CardGameState extends State<CardGame> {
       showTemporaryMessage("Try again!", Colors.red);
       // await flutterTtsUrdu.stop();
       // await flutterTtsUrdu.speak("کوئی بات نہیں، دوبارہ کوشش کرو");
-      await flutterTtsEng.stop();
-      await flutterTtsEng.speak("Try Again");
+      await FlutterTtsEng.stop();
+      await FlutterTtsEng.speak("Try Again");
       
 
       // ✅ Message stays on screen until TTS finishes
@@ -946,7 +1060,7 @@ class _CardGameState extends State<CardGame> {
                           //   option,
                           //   style: const TextStyle(color: Colors.black),
                           // ),
-                          child: EmotionLabel(option, fontSize: 28, showWhiteBackground: true,),
+                          child: EmotionLabel(option, fontSize: 28, showWhiteBackground: false,),
                         ),
                       ),
                     );
@@ -958,7 +1072,7 @@ class _CardGameState extends State<CardGame> {
           ),
           // 🔁 Skip Level Button
                   Positioned(
-                    right: screenWidth * 0.01,
+                    right: screenWidth * 0.03,
                     bottom: screenHeight * 0.01,
                     // child: Padding(
                     // padding: EdgeInsets.only(top: 26.h),
@@ -992,12 +1106,12 @@ class _CardGameState extends State<CardGame> {
                           );
 
                           // ✅ Now show replay/next stage dialog
-                          if (!mounted) return;
+                          if (!context.mounted) return;
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: const Text("Level Completed!"),
-                              content: const Text("Do you want to exit or go to the next stage?"),
+                              title: const Text("Part 1 Completed!"),
+                              content: const Text("Do you want to exit or go to the next part?"),
                               actions: [
                                 TextButton(
                                   onPressed: () async {await navigateToUserDashboard(context);
@@ -1018,7 +1132,7 @@ class _CardGameState extends State<CardGame> {
                                       ),
                                     );
                                   },
-                                  child: const Text("Next Stage"),
+                                  child: const Text("Next Part"),
                                 ),
                               ],
                             ),
@@ -1206,7 +1320,7 @@ class _TransitionToLevel2State extends State<TransitionToLevel2>
       builder: (context) => AlertDialog(
         title: const Text("Emotions Memory Game"),
         content: const Text(
-          "You are now going to start the second level in which you have to find pairs of the same emotion. Best of luck!",
+          "You are now going to start the second part in which you have to find pairs of the same emotion. Best of luck!",
         ),
         actions: [
           TextButton(
@@ -1214,7 +1328,7 @@ class _TransitionToLevel2State extends State<TransitionToLevel2>
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MemoryGameScreen()), // Replace with your game 
               );
             },
-            child: const Text("Start Game"),
+            child: const Text("Start"),
           )
         ],
       ),
@@ -1318,7 +1432,7 @@ class _TransitionToLevel2State extends State<TransitionToLevel2>
 
 
 class MemoryGameScreen extends StatefulWidget {
-  const MemoryGameScreen({Key? key}) : super(key: key);
+    const MemoryGameScreen({super.key});
 
   @override
   State<MemoryGameScreen> createState() => _MemoryGameScreenState();
@@ -1331,7 +1445,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
   late List<bool> _matched;
   late AnimationController _matchAnimationController;
   late Animation<double> _matchAnimation;
-  Set<int> _matchedIndices = {};
+  final Set<int> _matchedIndices = {};
   int _firstFlippedIndex = -1;
   int _level = 1;
   int _gridRows = 2;
@@ -1489,8 +1603,8 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
     showTemporaryMessage("Great Job!", Colors.green);
     // await flutterTtsUrdu.stop();
     // await flutterTtsUrdu.speak("شاباش! بہت خوب");
-    await flutterTtsEng.stop();
-    await flutterTtsEng.speak("Good Job!");
+    await FlutterTtsEng.stop();
+    await FlutterTtsEng.speak("Good Job!");
 
     await Future.delayed(const Duration(seconds: 3));
 
@@ -1528,8 +1642,8 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
-              title: const Text("Level Completed!"),
-              content: const Text("Do you want to exit or go to the next stage?"),
+              title: const Text("Part 2 Completed!"),
+              content: const Text("Do you want to exit or go to the next part?"),
               actions: [
                 TextButton(
                   onPressed: () async {await navigateToUserDashboard(context);
@@ -1548,7 +1662,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                       ),
                     );
                   },
-                  child: const Text("Next Stage"),
+                  child: const Text("Next Part"),
                 ),
               ],
             ),
@@ -1574,8 +1688,8 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final cardSize = screenSize.width / _gridCols - 16.w;
+    // final screenSize = MediaQuery.of(context).size;
+    // final cardSize = screenSize.width / _gridCols - 16.w;
 
     return Scaffold(
       appBar: AppBar(
@@ -1632,7 +1746,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                             borderRadius: BorderRadius.circular(12.r),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 4.r,
                               ),
                             ],
@@ -1869,7 +1983,7 @@ class _TransitionToLevel3State extends State<TransitionToLevel3>
       builder: (context) => AlertDialog(
         title: const Text("Scenario Box Game"),
         content: const Text(
-          "You are now going to start the third level in which you have to guess the correct emotion according to the scenario. Best of luck!",
+          "You are now going to start the third part in which you have to guess the correct emotion according to the scenario. Best of luck!",
         ),
         actions: [
           TextButton(
@@ -1877,7 +1991,7 @@ class _TransitionToLevel3State extends State<TransitionToLevel3>
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TreasureBoxGameScreen()),
               );
             },
-            child: const Text("Start Game"),
+            child: const Text("Start"),
           )
         ],
       ),
@@ -2024,7 +2138,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
     {
       "image": "assets/images/fighting.png",
       "options": ["assets/images/angry.png", "assets/images/afraid.png"],
-      "emotions": ["Angry", "Afraid"],
+      "emotions": ["Happy", "Afraid"],
       "correct": 1,
     },
     {
@@ -2046,10 +2160,10 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
       "correct": 1,
     },
     {
-      "image": "assets/images/bad_marks.png",
+      "image": "assets/images/eid.png",
       "options": ["assets/images/sad.png", "assets/images/happy.png"],
       "emotions": ["Sad", "Happy"],
-      "correct": 0,
+      "correct": 1,
     },
     {
       "image": "assets/images/sick.png",
@@ -2076,7 +2190,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
   late Animation<Offset> _flashcardSlide;
   late Animation<double> _flashcardFade;
 
-  // final Map<String, String> Maps = {
+  // final Map<String, String> EmotionMap = {
   //   "Angry/Start hitting": "Angry",
   //   "Afraid/Get help": "Afraid",
   //   "Surprised/Enjoy and play": "Surprised",
@@ -2091,7 +2205,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
 
   // };
 
-  final Map<String, String> Maps = {
+  final Map<String, String> emotionMap = {
     "assets/images/angry.png": "Angry",
     "assets/images/afraid.png": "Afraid",
     "assets/images/surprised.png": "Surprised",
@@ -2107,7 +2221,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
     super.initState();
     _score = 0;
     stopwatch.start();
-    flutterTtsEng.init();
+    FlutterTtsEng.init();
     _controllers = List.generate(
       6,
       (_) => AnimationController(
@@ -2259,8 +2373,8 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
       showConfetti();
       // await flutterTtsUrdu.stop();
       // await flutterTtsUrdu.speak("شاباش! آپ نے درست جواب دیا");
-      await flutterTtsEng.stop();
-      await flutterTtsEng.speak("Good Job");
+      await FlutterTtsEng.stop();
+      await FlutterTtsEng.speak("Good Job");
 
 
       _score += 10;
@@ -2268,8 +2382,8 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
       showTemporaryMessage("Try again!", Colors.red);
       // await flutterTtsUrdu.stop();
       // await flutterTtsUrdu.speak("غلط جواب! کوئی بات نہیں");
-      await flutterTtsEng.stop();
-      await flutterTtsEng.speak("Try Again");
+      await FlutterTtsEng.stop();
+      await FlutterTtsEng.speak("Try Again");
       _score -= 2;
     }
 
@@ -2311,7 +2425,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
               ),
             );
             // await flutterTtsUrdu.speak("آپ نے تمام سوالات مکمل کر لیے ہیں");
-            await flutterTtsEng.speak("Level Complete");
+            await FlutterTtsEng.speak("Level Complete");
           });
         }
       });
@@ -2326,8 +2440,8 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
       });
 
       // await flutterTtsUrdu.speak(urduMap[option] ?? option);
-      await flutterTtsEng.stop();
-      await flutterTtsEng.speak(Maps[option] ?? option);
+      await FlutterTtsEng.stop();
+      await FlutterTtsEng.speak(emotionMap[option] ?? option);
       await Future.delayed(const Duration(seconds: 2)); // wait before next
     }
 
@@ -2476,7 +2590,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: currentlySpeakingIndex == i
-                                            ? const Color.fromARGB(255, 33, 229, 243)
+                                            ? Colors.white
                                             // : _answered
                                             //     ? i == _scenarios[_currentIndex!]["correct"]
                                             //         ? Colors.green
@@ -2537,7 +2651,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                                               timeSpent: timeSpent,
                                             );
 
-                                            if (!mounted) return;
+                                            if (!context.mounted) return;
                                             showDialog(
                                               context: context,
                                               builder: (_) => AlertDialog(
@@ -2551,7 +2665,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
                                                 ],
                                               ),
                                             );
-                                            await flutterTtsEng.speak("Level Complete");
+                                            await FlutterTtsEng.speak("Level Complete");
                                           });
                                         }
                                       });
