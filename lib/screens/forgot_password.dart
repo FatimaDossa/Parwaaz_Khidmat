@@ -84,7 +84,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 onPressed: _resetPassword,
                 child: const Text(
-                  'Send Resend Link',
+                  'Send Reset Link',
                   style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

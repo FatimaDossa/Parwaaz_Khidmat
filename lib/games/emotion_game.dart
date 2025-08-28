@@ -708,15 +708,6 @@ class _CardGameState extends State<CardGame> {
     CardLevel(imagePath: "assets/images/worried.png", correctAnswer: "Worried")
   ];
 
-  // final Map<String, String> urduMap = {
-  //   'Afraid': 'ڈرا ہوا',
-  //   'Angry': 'غصہ',
-  //   'Happy': 'خوش',
-  //   'Sad': 'اداس',
-  //   'Surprised': 'حیران',
-  //   'Worried': 'فکر مند',
-  // };
-
 
   //state variables
   int currentLevel = 0;
@@ -1045,7 +1036,7 @@ class _CardGameState extends State<CardGame> {
                           onPressed: () => checkAnswer(option),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isSpeaking
-                                ? const Color.fromARGB(255, 0, 81, 255)
+                                ? Colors.blue[200]
                                 : Colors.white,
                             padding: EdgeInsets.symmetric(
                               vertical: screenHeight * 0.01,
@@ -2101,44 +2092,12 @@ class TreasureBoxGameScreen extends StatefulWidget {
 } 
 
 class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with TickerProviderStateMixin {
-  // final List<Map<String, dynamic>> _scenarios = [
-  //   {
-  //     "image": "assets/images/fighting.png",
-  //     "options": ["Angry/Start hitting", "Afraid/Get help"],
-  //     "correct": 1,
-  //   },
-  //   {
-  //     "image": "assets/images/fun_with_friends.png",
-  //     "options": ["Surprised/Enjoy and play", "Scared/Start shouting"],
-  //     "correct": 0,
-  //   },
-  //   {
-  //     "image": "assets/images/girl_hurt.png",
-  //     "options": ["Happy/Start laughing", "Worried/Call for help"],
-  //     "correct": 1,
-  //   },
-  //   {
-  //     "image": "assets/images/giving_gift.png",
-  //     "options": ["Scared/Start shouting", "Happy/Be thankful"],
-  //     "correct": 1,
-  //   },
-  //   {
-  //     "image": "assets/images/bad_marks.png",
-  //     "options": ["Sad/Console her", "Happy/Make fun"],
-  //     "correct": 0,
-  //   },
-  //   {
-  //     "image": "assets/images/sick.png",
-  //     "options": ["Worried/Pray for them", "Angry/Get frustrated"],
-  //     "correct": 0,
-  //   },
-  // ];
 
   final List<Map<String, dynamic>> _scenarios = [
     {
       "image": "assets/images/fighting.png",
       "options": ["assets/images/angry.png", "assets/images/afraid.png"],
-      "emotions": ["Happy", "Afraid"],
+      "emotions": ["Angry", "Afraid"],
       "correct": 1,
     },
     {
@@ -2148,7 +2107,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
       "correct": 0,
     },
     {
-      "image": "assets/images/girl_hurt.png",
+      "image": "assets/images/boy_hurt.png",
       "options": ["assets/images/happy.png", "assets/images/worried.png"],
       "emotions": ["Happy", "Worried"],
       "correct": 1,
@@ -2167,8 +2126,8 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
     },
     {
       "image": "assets/images/sick.png",
-      "options": ["assets/images/worried.png", "assets/images/angry.png"],
-      "emotions": ["Worried", "Angry"],
+      "options": ["assets/images/worried.png", "assets/images/happy.png"],
+      "emotions": ["Worried", "Happy"],
       "correct": 0,
     },
   ];

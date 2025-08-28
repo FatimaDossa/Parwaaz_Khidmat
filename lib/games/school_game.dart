@@ -30,16 +30,16 @@ class _GameStartScreenBState extends State<GameStartScreenB> {
     List<String> assetsToLoad = [
       'assets/images/start_bg.jpg',
       'assets/images/school_bg2.png',
-      'assets/images/playground_icon.png',
-      'assets/images/classroom_icon.png',
+      'assets/images/playground.png',
+      'assets/images/classroom.png',
       'assets/images/class_bg.png',
       'assets/images/carton_box.png',
-      'assets/images/classroom1.jpg',
-      'assets/images/classroom2.jpg',
-      'assets/images/classroom3.jpg',
-      'assets/images/classroom4.jpg',
-      'assets/images/classroom5.jpg',
-      'assets/images/classroom6.jpg',
+      'assets/images/classroom1.png',
+      'assets/images/classroom2.png',
+      'assets/images/classroom3.png',
+      'assets/images/classroom4.png',
+      'assets/images/classroom5.png',
+      'assets/images/classroom6.png',
       'assets/images/playground_bg.jpg',
       'assets/images/playground1.png',
       'assets/images/playground2.png',
@@ -230,13 +230,13 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
   };
 
   final Map<String, Offset> locationPositions = {
-    'Classroom': Offset(68, 155),
-    'Playground': Offset(62, 325)
+    'Classroom': Offset(125, 170),
+    'Playground': Offset(125, 350)
   };
 
   final Map<String, String> locationIcons = {
-    'Classroom': 'assets/images/classroom_icon.png',
-    'Playground': 'assets/images/playground_icon.png'
+    'Classroom': 'assets/images/classroom.png',
+    'Playground': 'assets/images/playground.png'
   };
 
   double _scale = 1.0;
@@ -295,7 +295,9 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
   }
 
 
-  void _showCompletionDialog() {
+  void _showCompletionDialog() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -366,6 +368,7 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
             child: Center(
               child: Text(
                 'Tap on a location to explore the scenario.',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: screenWidth * 0.045,
                   fontWeight: FontWeight.bold,
@@ -381,8 +384,8 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
             Offset position = entry.value;
 
             // Assign different sizes based on location
-            double iconWidth = location == 'Classroom' ? screenWidth * 0.6 : screenWidth * 0.63;
-            double iconHeight = location == 'Classroom' ? screenWidth * 0.44 : screenWidth * 0.47;
+            double iconWidth = location == 'Classroom' ? screenWidth * 0.3 : screenWidth * 0.3;
+            double iconHeight = location == 'Classroom' ? screenWidth * 0.3 : screenWidth * 0.3;
 
             return Positioned(
               left: position.dx.w,
@@ -415,69 +418,21 @@ class _SchoolMapScreenState extends State<SchoolMapScreen> with SingleTickerProv
                             ),
                         ],
                       ),
-                      // SizedBox(height: 0.1.h), // very small gap between icon & label
-                      // Text(
-                      //   location,
-                      //   style: TextStyle(
-                      //     fontSize: screenWidth * 0.045,
-                      //     fontWeight: FontWeight.bold,
-                      //     color: Colors.black,
-                      //   ),
-                      // ),
+                      SizedBox(height: 0.1.h), // very small gap between icon & label
+                      Text(
+                        location,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
             );
           }),
-
-
-
-          // // Tappable Locations
-          // ...locationPositions.entries.map((entry) {
-          //   String location = entry.key;
-          //   Offset position = entry.value;
-
-          //   return Positioned(
-          //     left: position.dx.w,
-          //     top: position.dy.h,
-          //     child: GestureDetector(
-          //       onTap: () => _navigateToScenario(location),
-          //       child: AnimatedScale(
-          //         scale: _scale,
-          //         duration: const Duration(milliseconds: 150),
-          //         child: Column(
-          //           children: [
-          //             Stack(
-          //               alignment: Alignment.center,
-          //               children: [
-          //                 Image.asset(
-          //                   locationIcons[location] ?? 'assets/images/red_stop.png',
-          //                   width: screenWidth * 0.52,
-          //                   height: screenWidth * 0.52,
-          //                 ),
-          //                 if (visitedLocations[location] == true)
-          //                   Container(
-          //                     width: screenWidth * 0.1,
-          //                     height: screenWidth * 0.1,
-          //                     decoration: BoxDecoration(
-          //                       color: Colors.green.withOpacity(0.5),
-          //                       shape: BoxShape.circle,
-          //                     ),
-          //                     child: const Icon(Icons.check, color: Colors.white, size: 40),
-          //                   ),
-          //               ],
-          //             ),
-          //             // Text(
-          //             //   location,
-          //             //   style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold),
-          //             // ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   );
-          // })
         ],
       ),
     );
@@ -513,32 +468,32 @@ class _ClassroomScenarioScreenState extends State<ClassroomScenarioScreen> with 
 
   List<Map<String, dynamic>> flashcards = [
     {
-      'image': 'assets/images/classroom1.jpg',
+      'image': 'assets/images/classroom1.png',
       'isGood': false,
       'description': 'The student is eating in class without taking permission.'
     },
     {
-      'image': 'assets/images/classroom2.jpg',
+      'image': 'assets/images/classroom2.png',
       'isGood': false,
       'description': 'The students are playing with the books.'
     },
     {
-      'image': 'assets/images/classroom3.jpg',
+      'image': 'assets/images/classroom3.png',
       'isGood': true,
       'description': 'The students are helping each other out.'
     },
     {
-      'image': 'assets/images/classroom4.jpg',
+      'image': 'assets/images/classroom4.png',
       'isGood': false,
       'description': 'The student is sitting on the table rather than the chair.'
     },
     {
-      'image': 'assets/images/classroom5.jpg',
+      'image': 'assets/images/classroom5.png',
       'isGood': true,
       'description': 'The students are listening to the teacher attentively.'
     },
     {
-      'image': 'assets/images/classroom6.jpg',
+      'image': 'assets/images/classroom6.png',
       'isGood': false,
       'description': 'The student is cheating.'
     },
@@ -973,16 +928,16 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
     PlaygroundScenario(
       image: 'assets/images/playground1.png',
       description: 'The kid has fallen and is hurt.',
-      steps: ['Help her get First Aid', 'Call Teacher', 'Calm the Kid'],
-      correctOrder: ['Calm the Kid', 'Call Teacher', 'Help her get First Aid'],
+      steps: ['Take care of your friend', 'Be alert', 'Inform Teacher'],
+      correctOrder: ['Be alert', 'Inform Teacher', 'Take care of your friend'],
       position: Offset(3, 15),
       size: Size(250,250),
     ),
     PlaygroundScenario(
       image: 'assets/images/playground2.png',
       description: 'A fight is happening on the playground.',
-      steps: ['Separate Kids', 'Inform Teacher', 'Resolve the Issue'],
-      correctOrder: ['Separate Kids', 'Inform Teacher', 'Resolve the Issue'],
+      steps: ['Be aware of whos fighting', 'Inform Teacher', 'Resolve the Issue'],
+      correctOrder: ['Be aware of whos fighting', 'Inform Teacher', 'Resolve the Issue'],
       position: Offset(2, 15),
       size: Size(350, 350),
     ),
@@ -997,8 +952,8 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
     PlaygroundScenario(
       image: 'assets/images/playground4.png',
       description: 'One kid is snatching the other kids toy',
-      steps: ['Separate Kids', 'Advice to share and not fight', 'Inform Teacher'],
-      correctOrder: ['Separate Kids', 'Inform Teacher', 'Advice to share and not fight'],
+      steps: ['Dont shout', 'Advice to share and not fight', 'Inform Teacher'],
+      correctOrder: ['Dont shout', 'Inform Teacher', 'Advice to share and not fight'],
       position: Offset(3, 3),
       size: Size(350,350),
     ),
@@ -1321,7 +1276,7 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                 scale: flashcardController,
                 child: Container(
                   width: 350.w,
-                  padding: EdgeInsets.all(16.w),
+                  padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16.r),
@@ -1397,14 +1352,14 @@ class _PlaygroundScreenState extends State<PlaygroundScreen> with TickerProvider
                         }),
                       ),
 
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 15.h),
                       ElevatedButton(
                         onPressed: _resetAttempt,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orangeAccent,
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                          // backgroundColor: Colors.orangeAccent,
+                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
                         ),
-                        child: Text('Refresh', style: TextStyle(fontSize: 18.sp , color: Colors.black , fontWeight: FontWeight.bold)),
+                        child: Text('Refresh', style: TextStyle(fontSize: 18.sp , fontWeight: FontWeight.bold)),
                       ),
                       // SizedBox(height: 12.h),
 
