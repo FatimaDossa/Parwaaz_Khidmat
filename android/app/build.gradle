@@ -1,0 +1,58 @@
+plugins {
+    id("com.android.application")
+    // Firebase / Google services plugin
+    id("com.google.gms.google-services")
+    id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after Android + Kotlin plugins
+    id("dev.flutter.flutter-gradle-plugin")
+}
+
+android {
+    namespace = "com.example.flutter_application_1" // must match Firebase package name
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+
+    defaultConfig {
+        applicationId = "com.example.flutter_application_1" // MUST match Firebase
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            // Temporary: use debug signing so APK runs on device
+            signingConfig = signingConfigs.debug
+
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            signingConfig = signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+dependencies {
+    // Required for MultiDex support if app > 64K methods
+    implementation 'androidx.multidex:multidex:2.0.1'
+}

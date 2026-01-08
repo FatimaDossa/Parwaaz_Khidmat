@@ -261,18 +261,13 @@ class GameStatsScreen extends StatelessWidget {
         children: [
           Expanded(
             child: FutureBuilder<DocumentSnapshot>(
-              future: statsRef.get(const GetOptions(source: Source.cache))
-                  .then((cachedDoc) async {
-                // If cached data is empty, try server
-                if (!cachedDoc.exists) {
-                  return await statsRef
-                      .get(const GetOptions(source: Source.server))
-                      .timeout(const Duration(seconds: 5));
-                }
-                return cachedDoc;
-              }).catchError((e) {
-                debugPrint("Error fetching game stats: $e");
-                throw e; // rethrow for builder to handle
+              future: statsRef
+                  .get(const GetOptions(source: Source.server)) // fetch from server first
+                  .timeout(const Duration(seconds: 5))
+                  .catchError((e) async {
+                debugPrint("Server fetch failed, trying cache: $e");
+                // fallback to cache if server fails
+                return await statsRef.get(const GetOptions(source: Source.cache));
               }),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

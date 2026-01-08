@@ -849,7 +849,7 @@ class _CardGameState extends State<CardGame> {
       showConfetti();
       // await flutterTtsUrdu.speak("شاباش! بہت خوب");
       await FlutterTtsEng.stop();
-      await FlutterTtsEng.speak("Good Job");
+      await FlutterTtsEng.speak("Correct");
 
       // ✅ Message stays on screen while TTS is speaking
       await Future.delayed(const Duration(seconds: 2)); // Small pause after speech
@@ -1591,11 +1591,11 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
     setState(() {
       showLevelCompleteOverlay = true;
     });
-    showTemporaryMessage("Great Job!", Colors.green);
+    showTemporaryMessage("Great Work!", Colors.green);
     // await flutterTtsUrdu.stop();
     // await flutterTtsUrdu.speak("شاباش! بہت خوب");
     await FlutterTtsEng.stop();
-    await FlutterTtsEng.speak("Good Job!");
+    await FlutterTtsEng.speak("Great Work!");
 
     await Future.delayed(const Duration(seconds: 3));
 
@@ -1667,6 +1667,11 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
       _setupGame();
 
     });
+  }
+
+  void _skipLevel() async{
+    showTemporaryMessage("Level Skipped!", Colors.red);
+    _nextLevel();
   }
 
   @override
@@ -1797,7 +1802,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                   child: Padding(
                     padding: EdgeInsets.only(top: 16.h),
                     child: ElevatedButton.icon(
-                      onPressed: _nextLevel,
+                      onPressed: _skipLevel,
                       icon: const Icon(Icons.skip_next),
                       label: const Text("Skip"),
                       style: ElevatedButton.styleFrom(
@@ -2333,16 +2338,16 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
       // await flutterTtsUrdu.stop();
       // await flutterTtsUrdu.speak("شاباش! آپ نے درست جواب دیا");
       await FlutterTtsEng.stop();
-      await FlutterTtsEng.speak("Good Job");
+      await FlutterTtsEng.speak("Correct");
 
 
       _score += 10;
     } else {
-      showTemporaryMessage("Try again!", Colors.red);
+      showTemporaryMessage("Incorrect!", Colors.red);
       // await flutterTtsUrdu.stop();
       // await flutterTtsUrdu.speak("غلط جواب! کوئی بات نہیں");
       await FlutterTtsEng.stop();
-      await FlutterTtsEng.speak("Try Again");
+      await FlutterTtsEng.speak("Incorrect");
       _score -= 2;
     }
 
@@ -2384,7 +2389,7 @@ class _TreasureBoxGameScreenState extends State<TreasureBoxGameScreen> with Tick
               ),
             );
             // await flutterTtsUrdu.speak("آپ نے تمام سوالات مکمل کر لیے ہیں");
-            await FlutterTtsEng.speak("Level Complete");
+            await FlutterTtsEng.speak("Game Complete");
           });
         }
       });

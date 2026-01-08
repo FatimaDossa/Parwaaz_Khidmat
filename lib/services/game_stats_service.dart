@@ -16,7 +16,7 @@ class GameStatsService {
         .collection('users')
         .doc(userId);
 
-    final docSnapshot = await docRef.get();
+    final docSnapshot = await docRef.get(const GetOptions(source: Source.server));
 
     final partPath = 'parts.$partId';
 
@@ -29,9 +29,13 @@ class GameStatsService {
       final prevCount = (partData['timesCompleted'] ?? 0).toInt();
       final newCount = prevCount + 1;
 
+      final prevTotalScore = prevScore * prevCount;
+      final prevTotalTime = prevTime * prevCount;
+
+
       await docRef.update({
-        '$partPath.avgScore': newCount > 0 ? (prevScore + score) / newCount : score,
-        '$partPath.avgTime': newCount > 0 ? (prevTime + timeSpent) / newCount : score,
+        '$partPath.avgScore': newCount > 0 ? (prevTotalScore + score) / newCount : score,
+        '$partPath.avgTime': newCount > 0 ? (prevTotalTime + timeSpent) / newCount : timeSpent,
         '$partPath.timesCompleted': newCount,
         'lastPlayed': FieldValue.serverTimestamp(),
       });

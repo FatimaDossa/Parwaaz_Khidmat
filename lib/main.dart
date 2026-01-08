@@ -284,7 +284,8 @@ class RootScreen extends StatelessWidget {
             }
 
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Scaffold(body: Center(child: Text('User not found')));
+              return CoverScreen();
+              // return const Scaffold(body: Center(child: Text('User not found')));
             }
 
             final userType = snapshot.data!['userType'];
