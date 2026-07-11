@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+**/build/
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +44,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android — machine-specific config and caches, must never be shared between developers
+android/.gradle/
+android/local.properties
+
+# iOS — machine-specific pods and symlinks
+ios/Pods/
+ios/.symlinks/
+
+# Signing credentials — never commit these
+key.properties
+**/*.keystore
+**/*.jks

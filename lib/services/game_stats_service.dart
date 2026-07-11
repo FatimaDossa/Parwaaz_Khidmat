@@ -1,3 +1,4 @@
+// File: lib/services/game_stats_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GameStatsService {
@@ -16,7 +17,7 @@ class GameStatsService {
         .collection('users')
         .doc(userId);
 
-    final docSnapshot = await docRef.get(const GetOptions(source: Source.server));
+    final docSnapshot = await docRef.get(const GetOptions(source: Source.serverAndCache));
 
     final partPath = 'parts.$partId';
 

@@ -445,7 +445,7 @@ class _SunshineDashboardState extends State<SunshineDashboard> {
                           ),
                           _buildGameCard(
                             context,
-                            'Mannerism Master',
+                            'Good Habit Hero',
                             'assets/images/mannerism_sunshine.png',
                             const Color(0xFFD6FFC1),
                           ),

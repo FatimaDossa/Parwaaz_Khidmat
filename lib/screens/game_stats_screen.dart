@@ -226,6 +226,10 @@ import 'package:flutter/material.dart';
 
 import '../games/emotion_game.dart';
 import '../games/school_game.dart';
+import '../games/good_habit_hero.dart';
+import '../games/money_master.dart';
+import '../games/learning_ninja.dart';
+import '../games/social_adventure.dart';
 
 class GameStatsScreen extends StatelessWidget {
   final String gameId;
@@ -234,11 +238,13 @@ class GameStatsScreen extends StatelessWidget {
 
   final Map<String, WidgetBuilder> gameRoutes = {
     // sunshine games
-    'Learning Ninja': (_) => const GameStartScreenS(),
+    'Learning Ninja': (_) => const LearningNinjaHome(),
     'Emotion Explorer': (_) => const GameStartScreenS(),
-    'Mannerism Master': (_) => const GameStartScreenS(),
+    'Good Habit Hero': (_) => const GoodHabitHero(),
     // butterfly games
     'Back To School': (_) => const GameStartScreenB(),
+    'Money Master': (_) => const MoneyMasterGame(),
+    'Social Adventure': (_) => const MainGameScreen(),
   };
 
   @override

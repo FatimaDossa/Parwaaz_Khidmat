@@ -174,10 +174,10 @@ class _ButterflyDashboardState extends State<ButterflyDashboard> {
                   children: [
                     _buildGameCard(context, 'Back To School',
                         'assets/images/school_butterfly.png', const Color(0xFFFFF1C1)),
-                    _buildGameCard(context, 'Money Maker',
+                    _buildGameCard(context, 'Money Master',
                         'assets/images/money_butterfly.png', const Color(0xFFC1F1FF)),
-                    _buildGameCard(context, 'Shaadi Social',
-                        'assets/images/mannerism_sunshine.png', const Color(0xFFD6FFC1)),
+                    _buildGameCard(context, 'Social Adventure',
+                        'assets/images/social_adventure_logo.png', const Color(0xFFD6FFC1)),
                   ],
                 ),
               ],
