@@ -10,12 +10,11 @@
 
 ### 👥 Team Members
 
-| Name | ID |
-|------|------|
-| Fatima Dossa | fd08024 |
-| Sakina Zehra | sz08959 |
-| Afifah Uzair | au07879 |
-
+| Name 
+|------
+| Fatima Dossa 
+| Sakina Zehra 
+| Afifah Uzair 
 **In collaboration with ICAN (Icon for Child & Adult Nurturing)**
 
 </div>
