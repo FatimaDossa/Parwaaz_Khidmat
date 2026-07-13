@@ -49,7 +49,15 @@ class MoneyMasterGame extends StatelessWidget {
         ),
         home: Scaffold(
           appBar: AppBar(
-            title: const Text("Money Master", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              tooltip: 'Back',
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+            title: const Text(
+              "Money Master",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+            ),
             centerTitle: true,
           ),
           body: const LevelSelection(),
